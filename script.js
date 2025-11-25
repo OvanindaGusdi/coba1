@@ -1,3 +1,15 @@
+function setLampState(id, state) {
+    db.ref("kamar_ovan/lamp" + id).set(state);
+}
+
+function toggleLamp(id) {
+    ...
+    const newState = !isOn;
+    setLampState(id, newState);
+}
+
+
+
 // ========== LAMPU ==========
 function toggleLamp(id) {
     const img = document.getElementById(`lamp${id}_img`);
@@ -146,17 +158,20 @@ function updatePZEMValues(energy, power, freq, pf) {
     document.getElementById("pf-text").innerText = pf.toFixed(2); // power factor biasanya 0..1
 }
 
-async function toggleLamp1() {
-    let db = await loadStatus();
+// ========== Firebase read (keep UI synced) ==========
 
-    db.lampu1 = !db.lampu1;
-
-    saveStatus(db);
-
-    // update UI
-    updateLampUI(1, db.lampu1);
+function loadLampState(id) {
+    db.ref("kamar_ovan/lamp" + id).on("value", snap => {
+        const state = snap.val();
+        applyLampUI(id, state);
+    });
 }
 
+// panggil listener saat halaman dibuka
+loadLampState(1);
+loadLampState(2);
+loadLampState(3);
+loadLampState(4);
 
 // /* ============================
 //    DEMO ANIMASI GAUGE BERGERAK
@@ -204,3 +219,4 @@ async function toggleLamp1() {
 //     if (demoAmp <= 0) ampUp = true;
 
 // }, 120);
+
