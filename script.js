@@ -158,6 +158,16 @@ function updatePZEMValues(energy, power, freq, pf) {
     document.getElementById("pf-text").innerText = pf.toFixed(2); // power factor biasanya 0..1
 }
 
+async function toggleLamp1() {
+    let db = await loadStatus();
+
+    db.lampu1 = !db.lampu1;
+
+    saveStatus(db);
+
+    // update UI
+    updateLampUI(1, db.lampu1);
+}
 // ========== Firebase read (keep UI synced) ==========
 
 function loadLampState(id) {
@@ -219,4 +229,5 @@ loadLampState(4);
 //     if (demoAmp <= 0) ampUp = true;
 
 // }, 120);
+
 
