@@ -1,3 +1,18 @@
+// === FIREBASE CONFIG ===
+const firebaseConfig = {
+    apiKey: "API_KEY_KAMU",
+    authDomain: "xxx.firebaseapp.com",
+    databaseURL: "https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "xxx",
+    storageBucket: "xxx.appspot.com",
+    messagingSenderId: "xxx",
+    appId: "xxx"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
 function setLampState(id, state) {
     db.ref("kamar_ovan/lamp" + id).set(state);
 }
@@ -12,27 +27,35 @@ function toggleLamp(id) {
 
 // ========== LAMPU ==========
 function toggleLamp(id) {
-    const img = document.getElementById(`lamp${id}_img`);
     const btn = document.getElementById(`lamp${id}_btn`);
+    const img = document.getElementById(`lamp${id}_img`);
 
-    const isOn = btn.classList.contains("on");
+    const newState = !btn.classList.contains("on");
 
-    if (isOn) {
-        // Turn OFF
+    // update database
+    db.ref("kamar_ovan/lamp" + id).set(newState);
+
+    // update UI lokal
+    applyLampUI(id, newState);
+}
+
+function applyLampUI(id, state) {
+    const btn = document.getElementById(`lamp${id}_btn`);
+    const img = document.getElementById(`lamp${id}_img`);
+
+    if (state) {
+        img.src = "lamp_on.png";
+        btn.classList.add("on");
+        btn.classList.remove("off");
+        btn.innerText = "ON";
+    } else {
         img.src = "lamp_off.png";
-        img.classList.remove("lamp-on");
         btn.classList.remove("on");
         btn.classList.add("off");
         btn.innerText = "OFF";
-    } else {
-        // Turn ON
-        img.src = "lamp_on.png";
-        img.classList.add("lamp-on");
-        btn.classList.remove("off");
-        btn.classList.add("on");
-        btn.innerText = "ON";
     }
 }
+
 
 // ========== FAN ==========
 function toggleFan() {
@@ -177,11 +200,17 @@ function loadLampState(id) {
     });
 }
 
+
 // panggil listener saat halaman dibuka
 loadLampState(1);
 loadLampState(2);
 loadLampState(3);
 loadLampState(4);
+
+db.ref("kamar_ovan/lamp1").on("value", s => applyLampUI(1, s.val()));
+db.ref("kamar_ovan/lamp2").on("value", s => applyLampUI(2, s.val()));
+db.ref("kamar_ovan/lamp3").on("value", s => applyLampUI(3, s.val()));
+db.ref("kamar_ovan/lamp4").on("value", s => applyLampUI(4, s.val()));
 
 // /* ============================
 //    DEMO ANIMASI GAUGE BERGERAK
@@ -229,5 +258,6 @@ loadLampState(4);
 //     if (demoAmp <= 0) ampUp = true;
 
 // }, 120);
+
 
 
